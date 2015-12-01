@@ -1,0 +1,7 @@
+¤W¤È 08:50 2015/11/28
+1. pythonGame , drive the rumble pad
+	a. output the axis/button info
+2. hardware
+	a. update the driver IC
+	b. update the 24-5 circuit
+	c. bettery may not acceptable

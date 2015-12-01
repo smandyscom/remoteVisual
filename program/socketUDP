@@ -1,0 +1,30 @@
+import socket
+import sys
+
+#build a client socket
+
+host = "127.0.0.1"
+port = 12345
+
+try:
+    sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+except socket.error,msg:
+    print 'Failed to create socket'
+    sys.exit();
+        
+print 'Socket Created'
+
+#UDP protocal , occupied port and keep receiving data
+try:
+    sock.bind((host,port))
+except socket.error,msg:
+    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+    sys.exit();
+        
+print 'UDP Socket Binded'
+
+while True:
+    reply,addr =  sock.recvfrom(4096)
+    print reply;
+
+
