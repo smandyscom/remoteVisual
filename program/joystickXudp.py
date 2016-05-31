@@ -1,14 +1,17 @@
 from time import sleep
 import pygame
-
+#in order to drive event.get , need to initialize base module
+pygame.init()
 pygame.joystick.init()
 axisIndex=0
 joystick = pygame.joystick.Joystick(axisIndex)
 
 joystick.init()
-print joystick.get_numaxes()
+print ("Joystick initialize status {0}".format(joystick.get_init()))
+print ("Joystick name {0}".format(joystick.get_name()))
 var=1
 while var == 1:
-  print joystick.get_button(1)
-  sleep(0.1)
+   pygame.event.get()
+   print ("Axis value {:>6.3f}".format(joystick.get_axis(0)))
+   sleep(0.1)
 
