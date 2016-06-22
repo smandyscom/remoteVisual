@@ -18,4 +18,3 @@ while 1:
     buf , address = receiver.recvfrom(1024)
     obj = pickle.load(StringIO.StringIO(buf))
     print obj
-    sleep(1)
