@@ -10,7 +10,7 @@ pygame.joystick.init()
 js = pygame.joystick.Joystick(0)
 js.init()
 commandPack = joystickCommandPack.commandPack()
-sender = objectTransmission.objSender(('127.0.0.1',5001))
+sender = objectTransmission.objSender(('192.168.10.15', 5001))
 while 1:
     # Process all event
     for event in pygame.event.get():
