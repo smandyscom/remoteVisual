@@ -11,6 +11,6 @@ while 1:
     pack = receiver.recvfrom()
     # piController.set_servo_pulsewidth(21, (pack.axisValues[0]+1) * 750 + 750)
     # piController.set_PWM_dutycycle(18, (pack.axisValues[3]+1) * 125)
-    piController.set_servo_pulsewidth(18, pack.toServoCommand[0])
-    piController.set_servo_pulsewidth(21, pack.toServoCommand[1])
+    piController.set_servo_pulsewidth(18, pack.toServoCommand()[0])
+    piController.set_servo_pulsewidth(21, pack.toServoCommand()[1])
     print pack
