@@ -8,4 +8,8 @@ class buttonIncrementor:
         return "%s;%s" % (self.currentPosition, self.increment)
     def move(self, forward):
         self.currentPosition += ((int(forward == True) - 0.5) * 2) * self.increment
+        if self.currentPosition < 500:
+            self.currentPosition = 500
+        if self.currentPosition > 2500:
+            self.currentPosition = 2500
         return self.currentPosition

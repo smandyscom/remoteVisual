@@ -14,7 +14,7 @@ while 1:
     # piController.set_PWM_dutycycle(18, (pack.axisValues[3]+1) * 125)
     # piController.set_servo_pulsewidth(18, pack.axis2Servo()[0])
     # piController.set_servo_pulsewidth(21, pack.axis2Servo()[1])
-    piController.set_PWM_dutycycle(19, pack.axis2Pwm()[2])
+    piController.hardware_PWM(19, 100,  pack.axis2Pwm()[2])
     if pack.buttonValues[0] == 1:
         __buttonIncrementor.move(True)
     if pack.buttonValues[1] == 1:
