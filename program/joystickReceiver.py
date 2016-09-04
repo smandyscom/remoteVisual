@@ -7,6 +7,7 @@ import buttonIncrementor
 receiver = objectTransmission.objReceiver(('', 5001))
 piController = pigpio.pi()
 __buttonIncrementor = buttonIncrementor.buttonIncrementor()
+__buttonIncrementor2 = buttonIncrementor.buttonIncrementor()
 while 1:
     # print receiver.recvfrom()
     pack = receiver.recvfrom()
@@ -14,10 +15,15 @@ while 1:
     # piController.set_PWM_dutycycle(18, (pack.axisValues[3]+1) * 125)
     # piController.set_servo_pulsewidth(18, pack.axis2Servo()[0])
     # piController.set_servo_pulsewidth(21, pack.axis2Servo()[1])
-    piController.hardware_PWM(19, 100,  pack.axis2Pwm()[2])
+    # piController.hardware_PWM(19, 100,  pack.axis2Pwm()[2])
     if pack.buttonValues[0] == 1:
         __buttonIncrementor.move(True)
     if pack.buttonValues[1] == 1:
         __buttonIncrementor.move(False)
-    piController.set_servo_pulsewidth(21, __buttonIncrementor.currentPosition)
+    piController.set_servo_pulsewidth(16, __buttonIncrementor.currentPosition)
+    if pack.buttonValues[2] == 1:
+        __buttonIncrementor2.move(True)
+    if pack.buttonValues[3] == 1:
+        __buttonIncrementor2.move(False)
+    piController.set_servo_pulsewidth(20, __buttonIncrementor2.currentPosition)
     print pack
