@@ -1,13 +1,13 @@
 import BaseHTTPServer
 import SimpleHTTPServer
 import buttonIncrementor
-import pigpio
+# import pigpio
 FILE = 'jquery.html'
 PORT = 8060
 
 axis1 = buttonIncrementor.buttonIncrementor()
 axis2 = buttonIncrementor.buttonIncrementor()
-piController = pigpio.pi()
+# piController = pigpio.pi()
 
 class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         """The test example handler."""
@@ -26,8 +26,8 @@ class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 axis2.move(True)
             if data_string == "right":
                 axis2.move(False)
-            piController.set_servo_pulsewidth(16, axis1.currentPosition)
-            piController.set_servo_pulsewidth(20, axis2.currentPosition)
+            # piController.set_servo_pulsewidth(16, axis1.currentPosition)
+            # piController.set_servo_pulsewidth(20, axis2.currentPosition)
 
 def start_server():
     """Start the server."""
