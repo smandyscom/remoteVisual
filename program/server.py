@@ -1,3 +1,5 @@
+import StringIO
+import time
 import BaseHTTPServer
 from SocketServer import ThreadingMixIn
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
@@ -13,29 +15,26 @@ axis2 = buttonIncrementor.buttonIncrementor()
 
 class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path.endswith('.mjpg'):
+        if self.path.endswith('cam.mjpg'):
+            print "handling cam.mjpgl.."
             self.send_response(200)
             self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
             while True:
 				try:
-					rc,img = capture.read()
-					if not rc:
-						continue
-					imgRGB=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-					jpg = Image.fromarray(imgRGB)
+					# jpg = Image.fromarray(imgRGB)
 					tmpFile = StringIO.StringIO()
-					jpg.save(tmpFile,'jpeg')
+					# jpg.save(tmpFile,'jpeg')
 					self.wfile.write("--jpgboundary")
 					self.send_header('Content-type','image/jpeg')
 					self.send_header('Content-length',str(tmpFile.len))
 					self.end_headers()
-					jpg.save(self.wfile,'jpeg')
+					# jpg.save(self.wfile,'jpeg')
 					time.sleep(0.05)
 				except KeyboardInterrupt:
 					break
             return
-        if self.path.endswith('.html'):
+        if self.path.endswith('index.html'):
             # return super(TestHandler, self).do_GET(self)
             return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
             """The test example handler."""
