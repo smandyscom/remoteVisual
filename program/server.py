@@ -13,6 +13,15 @@ axis1 = buttonIncrementor.buttonIncrementor()
 axis2 = buttonIncrementor.buttonIncrementor()
 # piController = pigpio.pi()
 
+
+def image(filename):
+    with open(filename, "rb") as f:
+        # for byte in f.read(1) while/if byte ?
+        byte = f.read(1)
+        while byte:
+            yield byte
+            # Next byte
+            byte = f.read(1)
 class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.endswith('cam.mjpg'):
@@ -20,18 +29,22 @@ class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
+            index=1
             while True:
-				try:
-					# jpg = Image.fromarray(imgRGB)
-					tmpFile = StringIO.StringIO()
-					# jpg.save(tmpFile,'jpeg')
-					self.wfile.write("--jpgboundary")
-					self.send_header('Content-type','image/jpeg')
-					self.send_header('Content-length',str(tmpFile.len))
-					self.end_headers()
-					# jpg.save(self.wfile,'jpeg')
-					time.sleep(0.05)
-				except KeyboardInterrupt:
+                try:
+                    tmpFile = StringIO.StringIO()
+                    self.wfile.write("--jpgboundary")
+                    self.send_header('Content-type','image/jpeg')
+                    self.send_header('Content-length',str(tmpFile.len))
+                    self.end_headers()
+                    filename='{0}.jpg'.format(index)
+                    for chunk in image(filename):
+                        self.wfile.write(chunk)
+                    index+=1
+                    if index > 3:
+                        index=1
+                    time.sleep(0.05)
+                except KeyboardInterrupt:
 					break
             return
         if self.path.endswith('index.html'):
