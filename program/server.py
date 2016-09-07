@@ -5,14 +5,18 @@ from SocketServer import ThreadingMixIn
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import SimpleHTTPServer
 import buttonIncrementor
-# import pigpio
+import pigpio
+import io
+import picamera
+
 FILE = 'jquery.html'
 PORT = 8060
 
 axis1 = buttonIncrementor.buttonIncrementor()
 axis2 = buttonIncrementor.buttonIncrementor()
-# piController = pigpio.pi()
+piController = pigpio.pi()
 
+cam=None
 
 def image(filename):
     with open(filename, "rb") as f:
@@ -22,6 +26,7 @@ def image(filename):
             yield byte
             # Next byte
             byte = f.read(1)
+
 class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.endswith('cam.mjpg'):
@@ -29,34 +34,33 @@ class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
-            index=1
-            while True:
+            stream=io.BytesIO()
+            value=None
+            # index=1
+            # while True:
+            for foo in cam.capture_continuous(stream,'jpeg'):
                 try:
-                    tmpFile = StringIO.StringIO()
+                    value=stream.getvalue()
                     self.wfile.write("--jpgboundary")
                     self.send_header('Content-type','image/jpeg')
-                    self.send_header('Content-length',str(tmpFile.len))
+                    self.send_header('Content-length',len(value))
                     self.end_headers()
-                    filename='{0}.jpg'.format(index)
-                    for chunk in image(filename):
-                        self.wfile.write(chunk)
-                    index+=1
-                    if index > 3:
-                        index=1
-                    time.sleep(0.05)
+                    self.wfile.write(value)
+                    stream.seek(0)
+                    stream.truncate()
+                    # time.sleep(0.05)
                 except KeyboardInterrupt:
 					break
             return
         if self.path.endswith('index.html'):
-            # return super(TestHandler, self).do_GET(self)
             return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
             """The test example handler."""
     def do_POST(self):
         """Handle a post request ."""
         length = int(self.headers.getheader('content-length'))
         data_string = self.rfile.read(length)
-        # self.wfile.write(data_string) #as response
-        self.wfile.write("server received") #as response
+        self.wfile.write(data_string) #as response
+        # self.wfile.write("server received") #as response
         print 'received:{0}'.format(data_string)
         if data_string == "up":
             axis1.move(True)
@@ -66,8 +70,11 @@ class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             axis2.move(True)
         if data_string == "right":
             axis2.move(False)
-            # piController.set_servo_pulsewidth(16, axis1.currentPosition)
-            # piController.set_servo_pulsewidth(20, axis2.currentPosition)
+        if data_string == "hold":
+            piController.set_servo_pulsewidth(16, 0)
+            piController.set_servo_pulsewidth(20, 0)
+        piController.set_servo_pulsewidth(16, axis1.currentPosition)
+        piController.set_servo_pulsewidth(20, axis2.currentPosition)
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 	"""Handle requests in a separate thread."""
@@ -81,4 +88,6 @@ def start_server():
 
 if __name__ == "__main__":
     # open_browser()
+    cam=picamera.PiCamera()
+    cam.resolution = (640,480)
     start_server()
