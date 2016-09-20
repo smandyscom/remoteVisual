@@ -1,44 +1,46 @@
-import StringIO
+import protectedBytesIO
 import time
 import BaseHTTPServer
 from SocketServer import ThreadingMixIn
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import SimpleHTTPServer
 import buttonIncrementor
-import pigpio
+
+import driveMacCamera
+
+# import pigpio
 import io
-import picamera
+# import picamera
 
 PORT = 8060
+FPS = 1
 
 axis1 = buttonIncrementor.buttonIncrementor()
 axis2 = buttonIncrementor.buttonIncrementor()
-piController = pigpio.pi()
+# piController = pigpio.pi()
 
-cam=None
+stream = protectedBytesIO.protectedBytesIO(io.BytesIO())
+camera = driveMacCamera.macCamera(stream)
 
-stream=io.BytesIO()
+# value= io.FileIO('1.jpg').readall()
+
 
 class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.endswith('cam.mjpg'):
             print "handling cam.mjpgl.."
             self.send_response(200)
-            self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
+            self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
-            # index=1
             while True:
-            # for foo in cam.capture_continuous(stream,'jpeg'):
                 try:
-                    value=stream.getvalue()
+                    value = stream.getvalue()
                     self.wfile.write("--jpgboundary")
-                    self.send_header('Content-type','image/jpeg')
-                    self.send_header('Content-length',len(value))
+                    self.send_header('Content-type', 'image/jpeg')
+                    self.send_header('Content-length', len(value))
                     self.end_headers()
                     self.wfile.write(value)
-                    # stream.seek(0)
-                    # stream.truncate()
-                    # time.sleep(0.05)
+                    time.sleep(1 / FPS)
                 except KeyboardInterrupt:
 					break
             return
@@ -77,6 +79,5 @@ def start_server():
     server.serve_forever()
 
 if __name__ == "__main__":
-    cam=picamera.PiCamera()
-    cam.resolution = (640,480)
+    camera.serve_forever()
     start_server()
