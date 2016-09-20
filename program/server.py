@@ -9,7 +9,6 @@ import pigpio
 import io
 import picamera
 
-FILE = 'jquery.html'
 PORT = 8060
 
 axis1 = buttonIncrementor.buttonIncrementor()
@@ -17,7 +16,7 @@ axis2 = buttonIncrementor.buttonIncrementor()
 piController = pigpio.pi()
 
 cam=None
-
+stream=io.BytesIO()
 def image(filename):
     with open(filename, "rb") as f:
         # for byte in f.read(1) while/if byte ?
@@ -34,11 +33,11 @@ class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
-            stream=io.BytesIO()
+            # stream=io.BytesIO()
             value=None
             # index=1
-            # while True:
-            for foo in cam.capture_continuous(stream,'jpeg'):
+            while True:
+            # for foo in cam.capture_continuous(stream,'jpeg'):
                 try:
                     value=stream.getvalue()
                     self.wfile.write("--jpgboundary")
@@ -46,8 +45,8 @@ class TestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     self.send_header('Content-length',len(value))
                     self.end_headers()
                     self.wfile.write(value)
-                    stream.seek(0)
-                    stream.truncate()
+                    # stream.seek(0)
+                    # stream.truncate()
                     # time.sleep(0.05)
                 except KeyboardInterrupt:
 					break
@@ -91,3 +90,6 @@ if __name__ == "__main__":
     cam=picamera.PiCamera()
     cam.resolution = (640,480)
     start_server()
+    for foo in cam.capture_continuous(stream,'jpeg'):
+        stream.seek(0)
+        time.sleep(0.05)
